@@ -115,7 +115,7 @@ def filter_blacklisted_games(games_list):
 
 if __name__ == '__main__':
     print("*** [1/4] Getting games list from Schedule...")
-    raw_games = get_games_list()[:10]
+    raw_games = get_games_list()
     raw_games = filter_blacklisted_games(raw_games)
 
     print("*** [2/4] Attempting to automatically match games to data...")
