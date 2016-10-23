@@ -56,7 +56,7 @@ def giant_bomb_search(name):
 
 
 def giant_bomb_game_data(game_id):
-    base_url = "http://www.giantbomb.com/api/game/"
+    base_url = "http://www.giantbomb.com/api/game/{}".format(game_id)
     with open('api_keys.json', 'r') as f:
         api_key = json.load(f)['giant_bomb']
     headers = {'User-agent': 'Python'}
@@ -109,12 +109,13 @@ def process_game_platforms(games_list):
 
 def filter_blacklisted_games(games_list):
     black_list = ['Pre-Show', 'Setup Block', 'Finale']
-    return [x for x in games_list if not any(x['title'].startswith(y)
+    black_list = map(lambda x: x.lower(), black_list)
+    return [x for x in games_list if not any(x['title'].lower().startswith(y)
             for y in black_list)]
 
 if __name__ == '__main__':
     print("*** [1/4] Getting games list from Schedule...")
-    raw_games = get_games_list()
+    raw_games = get_games_list()[:10]
     raw_games = filter_blacklisted_games(raw_games)
 
     print("*** [2/4] Attempting to automatically match games to data...")
