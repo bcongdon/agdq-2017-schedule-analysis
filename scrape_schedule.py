@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import json
+from scrape_genres import get_game_genres
 
 
 def get_games_list():
@@ -113,18 +114,31 @@ def filter_blacklisted_games(games_list):
     return [x for x in games_list if not any(x['title'].lower().startswith(y)
             for y in black_list)]
 
+
+def add_game_genres(games_list):
+    for i, g in enumerate(games_list):
+        ascii_title = g['title'].encode('ascii', 'ignore')
+        print("({0}/{1}) Searching for: {2}".format(i + 1,
+                                                    len(games_list),
+                                                    ascii_title))
+        g['data']['genres'] = get_game_genres(g['data']['id'])
+    return games_list
+
 if __name__ == '__main__':
-    print("*** [1/4] Getting games list from Schedule...")
+    print("*** [1/5] Getting games list from Schedule...")
     raw_games = get_games_list()
     raw_games = filter_blacklisted_games(raw_games)
 
-    print("*** [2/4] Attempting to automatically match games to data...")
+    print("*** [2/5] Attempting to automatically match games to data...")
     raw_games = match_games_auto(raw_games)
 
-    print("*** [3/4] Manually fixing game data...")
+    print("*** [3/5] Manually fixing game data...")
     raw_games = match_games_manual(raw_games)
 
-    print("*** [4/4] Prompting for marathon platform...")
+    print("*** [4/5] Prompting for marathon platform...")
+    raw_games = process_game_platforms(raw_games)
+
+    print("*** [5/5] Downloading game genres...")
     raw_games = process_game_platforms(raw_games)
 
     with open('scraped_games.json', 'w+') as f:
